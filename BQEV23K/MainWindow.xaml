@@ -1,0 +1,167 @@
+﻿<Window x:Name="MainWindow1" x:Class="BQEV23K.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BQEV23K"
+        mc:Ignorable="d"
+        Height="768" Width="1024" Loaded="MainWindow_Loaded" Closing="MainWindow_Closing" FontSize="14">
+    <Grid x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="115"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="64"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="128"/>
+                <ColumnDefinition Width="96"/>
+                <ColumnDefinition Width="128"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Image x:Name="IconEV23K" Source="/Resources/USB-Disabled-128.png" Grid.Row="0" Grid.Column="0"/>
+            <Image x:Name="IconArrows" Source="/Resources/Arrows-Disabled-48.png" Width="48" RenderTransformOrigin="0.5,0.5" Grid.Row="0" Grid.Column="1">
+                <Image.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="90"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Image.RenderTransform>
+            </Image>
+            <Image x:Name="IconGauge" Source="/Resources/Gauge-Disabled-128.png" Grid.Row="0" Grid.Column="2"/>
+            <Label x:Name="LabelEV23KName" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center"/>
+            <Label x:Name="LabelGaugeName" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <TextBlock x:Name="LabelGaugeVersion" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+            <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
+                <Label x:Name="LabelGaugeVoltage"/>
+                <Label x:Name="LabelGaugeTemperature"/>
+            </StackPanel>
+        </Grid>
+        <TabControl x:Name="tabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1">
+            <TabItem Header="Mode Selection">
+                <WrapPanel Orientation="Vertical">
+                    <GroupBox Header="Select Type">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Name="ModeLearningCycle" Content="Learning Cycle" Margin="10,0" Checked="CycleTypeSelected" IsChecked="True"/>
+                            <RadioButton Name="ModeGpcCycle" Content="GPC Cycle" Checked="CycleTypeSelected"/>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Manual Mode" Width="392">
+                        <WrapPanel>
+                            <Button Name="ManualModeButton" Margin="0,0,0,5" Click="ModeSelectButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock>Continue</TextBlock>
+                                    <Image Source="/Resources/right.gif" Width="16" Height="16" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </Button>
+                            <TextBlock TextWrapping="Wrap" Text="Use this mode when there is no available hardware to assist in the automation of starting and stopping charge and discharge currents. This mode requires manual switching on and off charge and discharge at specific intervals of the learning cycle process." />
+                        </WrapPanel>
+                    </GroupBox>
+                    <GroupBox Header="Automatic Mode" Width="392">
+                        <WrapPanel>
+                            <Button Name="AutomaticModeButton" Margin="0,0,0,5" Click="ModeSelectButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock>Continue</TextBlock>
+                                    <Image Source="/Resources/right.gif" Width="16" Height="16" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </Button>
+                            <TextBlock TextWrapping="Wrap" Text="Use this mode when relays are available to automate starting and stopping charge and discharge currents. This mode requires one charge relay connected to pin VOUT and one load relay connected to pin HDQ of the EV2300 to fully automate the learning cycle process. DO NOT connect relays directly to the EV2300 pins! Use a driver (transistor logic) to control the relays."/>
+                        </WrapPanel>
+                    </GroupBox>                    
+                </WrapPanel>
+            </TabItem>
+            <TabItem Name="TabItemConfiguration" Header="Configuration" IsEnabled="False">
+                <WrapPanel Orientation="Vertical">
+                    <GroupBox Header="Data Flash Configuration">
+                        <local:LayoutGroup HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0">
+                            <TextBlock TextWrapping="Wrap" Text="Cycle related parameters stored in device data flash. Must be configured correct prior to learning cycle." Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgBattCellCount" Label="Cell Count" Unit="" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgBattChemID" Label="Chemistry ID" Unit="" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgBattTaperCurr" Label="Taper Current" Unit="mA" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgBattDsgCurrThres" Label="Discharge Current Threshold" Unit="mA" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgBattChgCurrThres" Label="Charge Current Threshold" Unit="mA" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgBattTermVolt" Label="Termination Voltage" Unit="mV" HorizontalAlignment="Left" Width="380"/>
+                        </local:LayoutGroup>
+                    </GroupBox>
+                    <GroupBox Header="Learning and GPC Cycle Configuration">
+                        <local:LayoutGroup HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0">
+                            <TextBlock TextWrapping="Wrap" Text="These parameters are defining limits for cycle control. Set as required." Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgCycleCellCount" Label="Cell Count" Unit="" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgCycleTaperCurr" Label="Taper Current" Unit="mA" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgCycleTermVolt" Label="Termination Voltage" Unit="mV" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgCycleDischargeRelaxHours" Label="Discharge Relax Time" Unit="Hours" Text="5" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgCycleChargeRelaxHours" Label="Charge Relax Time" Unit="Hours" Text="2" HorizontalAlignment="Left" Width="380"/>
+                        </local:LayoutGroup>
+                    </GroupBox>
+                    <Image Name="ConfigHelpImage"  Width="580" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </WrapPanel>
+            </TabItem>
+            <TabItem Name="TabItemLearningCycle" Header="Learning Cycle" IsEnabled="False">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Status" Background="White" Grid.Row="0">
+                        <DockPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5" DockPanel.Dock="Top">
+                                <local:LedControl x:Name="FlagVOK" Height="24" IsChecked="False" Label="VOK"/>
+                                <local:LedControl x:Name="FlagREST" Height="24" IsChecked="False" Label="REST"/>
+                                <local:LedControl x:Name="FlagRDIS" Height="24" IsChecked="False" Label="RDIS"/>
+                                <local:LedControl x:Name="FlagFC" Height="24" IsChecked="False" Label="FC"/>
+                                <local:LedControl x:Name="FlagQMAX" Height="24" IsChecked="False" Label="QMAX"/>
+                                <local:LedControl x:Name="FlagQEN" Height="24" IsChecked="False" Label="QEN"/>
+                                <local:LedControl x:Name="FlagGAUGE_EN" Height="24" IsChecked="False" Label="GAUGE_EN"/>
+                                <local:LedControl x:Name="FlagCHG" Height="24" IsChecked="False" Label="CHG"/>
+                                <local:LedControl x:Name="FlagDSG" Height="24" IsChecked="False" Label="DSG"/>
+                            </StackPanel>
+                            <StackPanel DockPanel.Dock="Right" Width="100">
+                                <Button Name="ButtonLearnStart" Margin="5" Click="ButtonLearnStart_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="Resources/StartLoop.png" Width="16" Height="16" Margin="0,0,10,0"/>
+                                        <TextBlock>Start</TextBlock>
+                                    </StackPanel>
+                                </Button>
+                                <Button Name="ButtonLearnCancel" Margin="5" Click="ButtonLearnCancel_Click" IsEnabled="False">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <Image Source="Resources/CancelLoop.png" Width="16" Height="16" Margin="0,0,10,0"/>
+                                        <TextBlock>Cancel</TextBlock>
+                                    </StackPanel>                                    
+                                </Button>
+                            </StackPanel>
+                            <WrapPanel DockPanel.Dock="Left" Orientation="Vertical">
+                                <Label x:Name="LearningTimeLabel" HorizontalAlignment="Left" Width="200"/>
+                                <Label x:Name="LearningVoltageLabel" HorizontalAlignment="Left" Width="200"/>
+                                <Label x:Name="LearningCurrentLabel" HorizontalAlignment="Left" Width="200"/>
+                                <Label x:Name="LearningTemperatureLabel" HorizontalAlignment="Left" Width="200"/>
+                            </WrapPanel>
+                        </DockPanel>
+                    </GroupBox>
+                    <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Height="5" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows"/>
+                    <GroupBox Header="Plot" Background="White" Grid.Row="2" Margin="0,0,0,25">
+                            <oxy:PlotView Name="PlotView1" Model="{Binding Plot1}" Margin="70,0,0,0"/>
+                    </GroupBox>
+                    <StackPanel Orientation="Horizontal" Grid.Row="2" VerticalAlignment="Bottom">
+                        <Button Name="ButtonResetZoom" Content="Reset Zoom" Margin="0,0,10,0" Width="100" Click="ButtonResetZoom_Click"/>
+                    </StackPanel>
+                    <GridSplitter HorizontalAlignment="Stretch" Grid.Row="3" Height="5" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows"/>
+                    <GroupBox Header="Log" Grid.Row="4">
+                        <local:LogViewer x:Name="LogView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White"/>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Name="TabItemGpcCycle" Header="GPC Cycle" IsEnabled="False">
+                <Grid/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
