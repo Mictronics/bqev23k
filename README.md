@@ -13,7 +13,7 @@ As a side effect it demonstrates:
 
 ## Recommended documentation
 
-[BQ40Z80 Technical documents] (http://www.ti.com/product/BQ40Z80/technicaldocuments
+[BQ40Z80 Technical documents] (http://www.ti.com/product/BQ40Z80/technicaldocuments)
 - SLUA848 How to Complete a Successful Learning Cycle for the bq40z80
 - SLUA868 bq40z80 Manufacture, Production, and Calibration
 - SLUUBT4A bq40z80EVM Li-Ion Battery Pack Manager Evaluation Module
@@ -27,7 +27,7 @@ As a side effect it demonstrates:
 - External relay jig for fully automated cycle (charger and load control).
 
 ## Build instructions
-Build and tested on Windows7 64bit with Visual Studio 2015.
+Built and tested on Windows7 64bit with Visual Studio 2015.
 
 ### Dependencies
 
@@ -53,6 +53,7 @@ Build and tested on Windows7 64bit with Visual Studio 2015.
    - Add System.Windows.Forms as reference in BQEV23K
    - Add WindowsFormsIntegration as reference in BQEV23K
 4. Add new AxBQ80XRWLib.AxBq80xRW class to your project code.
+
 MainWindow.xaml.cs
 ```
 using System.Windows;
