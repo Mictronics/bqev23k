@@ -7,7 +7,7 @@ As a side effect it demonstrates:
 - Implementation and access of bq80xrw.ocx COM component in C# WPF
 - Controlling the EV2300 GPIO pins (relay jig control)
 - Read and write to BQ40Z80 registers in normal mode and ManufacturerAccessBlock mode
-- Reading using the entire BQ40Z80 dataflash
+- Reading the entire BQ40Z80 dataflash
 - Running the BQ40Z80 learning and GPC cycle
 - Implementation and usage of Oxyplot WPF with real time update
 
