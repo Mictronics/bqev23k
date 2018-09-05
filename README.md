@@ -13,7 +13,7 @@ As a side effect it demonstrates:
 
 ## Recommended documentation
 
-[BQ40Z80 Technical documents] (http://www.ti.com/product/BQ40Z80/technicaldocuments)
+[BQ40Z80 Technical documents](http://www.ti.com/product/BQ40Z80/technicaldocuments)
 - SLUA848 How to Complete a Successful Learning Cycle for the bq40z80
 - SLUA868 bq40z80 Manufacture, Production, and Calibration
 - SLUUBT4A bq40z80EVM Li-Ion Battery Pack Manager Evaluation Module
