@@ -165,6 +165,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <AdditionalFiles Include="Resources\4800_0_02-bq40z80.bqz">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <AdditionalFiles Include="Resources\4800_0_02_03-bq40z80.bcfgx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

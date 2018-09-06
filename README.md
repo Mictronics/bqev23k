@@ -6,6 +6,7 @@ Especially written for the BQ40Z80 (2-Series to 7-Series battery pack manager wi
 As a side effect it demonstrates:
 - Implementation and access of bq80xrw.ocx COM component in C# WPF
 - Controlling the EV2300 GPIO pins (relay jig control)
+- Read device configuration files in TI .bqz format
 - Read and write to BQ40Z80 registers in normal mode and ManufacturerAccessBlock mode
 - Reading the entire BQ40Z80 dataflash
 - Running the BQ40Z80 learning and GPC cycle
