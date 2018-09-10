@@ -293,7 +293,6 @@ namespace BQEV23K
                                 gauge.ToggleChargerRelay(true);
                                 gauge.ToggleLoadRelay(false);
                                 pushLoadStartButton = true;
-                                LogWrite("Charge relay activated.");
                             }
                         }
                         elapsedTime = DateTime.Now.Subtract(t.StartTime);
@@ -305,8 +304,6 @@ namespace BQEV23K
                         gauge.ToggleChargerRelay(false);
                         gauge.ToggleLoadRelay(false);
                         pushLoadStartButton = true;
-                        if (gauge.Current != 0)
-                            LogWrite("Failure: Current not zero during relax!");
                     }
                     else if (taskType.Name == "DischargeTask")
                     {
@@ -325,8 +322,6 @@ namespace BQEV23K
                                     gauge.RemoteLoadStartButton();
                                     pushLoadStartButton = false;
                                 }
-                                    
-                                LogWrite("Discharge relay activated.");
                             }
                         }
                         elapsedTime = DateTime.Now.Subtract(t.StartTime);

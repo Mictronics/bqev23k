@@ -32,6 +32,7 @@ namespace BQEV23K
         private Cycle cycle;
         private CycleType selectedCycleType = CycleType.None;
         private CycleModeType selectedCycleModeType = CycleModeType.None;
+        private GpcDataLog gpcLog;
 
         /// <summary>
         /// Constructor.
@@ -186,8 +187,11 @@ namespace BQEV23K
                     FlagVOK.IsChecked = gauge.FlagVOK;
                     FlagCHG.IsChecked = gauge.FlagCHG;
                     FlagDSG.IsChecked = gauge.FlagDSG;
+                    FlagOCVFR.IsChecked = gauge.FlagOCV;
 
                     CfgBattChemID.Text = gauge.GetDisplayValue("CHEM_ID");
+                    CfgBattDesignVoltage.Text = gauge.DFDesignVoltage;
+                    CfgBattDesignCapacity.Text = gauge.DFDesignCapacity;
                     CfgBattCellCount.Text = gauge.DFCellCount;
                     CfgBattTermVolt.Text = gauge.DFTermVoltage;
                     CfgBattTaperCurr.Text = gauge.DFTaperCurrent;
@@ -201,7 +205,7 @@ namespace BQEV23K
                 LearningVoltageLabel.Content = "Voltage: " + gauge.GetDisplayValue("Voltage");
                 LearningCurrentLabel.Content = "Current: " + gauge.GetDisplayValue("Current");
                 LearningTemperatureLabel.Content = "Temperature: " + gauge.GetDisplayValue("Temperature");
-                if(cycle.RunningTaskName == "RelaxTask")
+                if (cycle.RunningTaskName == "RelaxTask")
                 {
                     LearningTimeLabel.Content = "Waiting Time: " + cycle.ElapsedTime.ToString(@"hh\:mm\:ss");
                 }
@@ -226,6 +230,11 @@ namespace BQEV23K
                 plot.Temperature = gauge.Temperature;
             }
             plot.Plot1.InvalidatePlot(true); // Refresh plot view
+
+            if(selectedCycleType == CycleType.GpcCycle && gpcLog != null)
+            {
+                gpcLog.WriteLine(gauge.Voltage, gauge.Current, gauge.Temperature);
+            }
         }
 
         /// <summary>
@@ -240,16 +249,16 @@ namespace BQEV23K
         }
 
         /// <summary>
-        /// Start new learning cycle on button click.
+        /// Start new learning or GPC cycle on button click.
         /// </summary>
         /// <param name="sender">Not used.</param>
         /// <param name="e">Not used.</param>
-        private async void ButtonLearnStart_Click(object sender, RoutedEventArgs e)
+        private async void ButtonCycleStart_Click(object sender, RoutedEventArgs e)
         {
             int cellCount = 0;
             int.TryParse(CfgCycleCellCount.Text, out cellCount);
 
-            if(cellCount <= 0 || cellCount > 7)
+            if (cellCount <= 0 || cellCount > 7)
             {
                 LogView.AddEntry("Invalid cell count!");
                 return;
@@ -261,7 +270,7 @@ namespace BQEV23K
             int ctv = (termVoltage / cellCount);
             if (termVoltage <= 0 || (ctv < 2500) || (termVoltage / cellCount > 4200))
             {
-                LogView.AddEntry("Invalid termination voltage! ("+ctv.ToString()+"mV/cell)");
+                LogView.AddEntry("Invalid termination voltage! (" + ctv.ToString() + "mV/cell)");
                 return;
             }
 
@@ -272,7 +281,7 @@ namespace BQEV23K
                 CfgCycleTaperCurr.Text = taperCurrent.ToString("D");
             }
 
-            if(taperCurrent <= 0)
+            if (taperCurrent <= 0)
             {
                 LogView.AddEntry("Invalid taper current!");
                 return;
@@ -292,32 +301,48 @@ namespace BQEV23K
                 return;
             }
 
-            /* Enable gauging mode */
-            if (gauge.FlagGAUGE_EN == false || gauge.FlagQEN == false)
-                gauge.CommandSetGaugeEnable();
+            if (selectedCycleType == CycleType.LearningCycle) { 
+                /* Enable gauging mode */
+                if (gauge.FlagGAUGE_EN == false || gauge.FlagQEN == false)
+                    gauge.CommandSetGaugeEnable();
 
-            await Task.Delay(CmdExecDelayMilliseconds);
+                await Task.Delay(CmdExecDelayMilliseconds);
 
-            if (gauge.FlagGAUGE_EN == false || gauge.FlagQEN == false)
-            {
-                LogView.AddEntry("Failed to enable gauging mode.");
-                return;
+                if (gauge.FlagGAUGE_EN == false || gauge.FlagQEN == false)
+                {
+                    LogView.AddEntry("Failed to enable gauging mode.");
+                    return;
+                }
+
+                /* Reset to disable resistance update */
+                gauge.CommandReset();
+                await Task.Delay(ResetCmdExecDelayMilliseconds);
+
+                if (gauge.FlagRDIS == false)
+                {
+                    LogView.AddEntry("Error: RDIS not set after reset.");
+                    return;
+                }
+
+                if (gauge.GetReadValue("LStatus") != 0x04)
+                {
+                    LogView.AddEntry("Error: LStatus != 0x04.");
+                    return;
+                }
             }
-
-            /* Reset to disable resistance update */
-            gauge.CommandReset();
-            await Task.Delay(ResetCmdExecDelayMilliseconds);
-
-            if (gauge.FlagRDIS == false)
+            else if (selectedCycleType == CycleType.GpcCycle)
             {
-                LogView.AddEntry("Error: RDIS not set after reset.");
-                return;
-            }
+                /* Disable gauging mode */
+                if (gauge.FlagGAUGE_EN == true || gauge.FlagQEN == true)
+                    gauge.CommandSetGaugeEnable();
 
-            if (gauge.GetReadValue("LStatus") != 0x04)
-            {
-                LogView.AddEntry("Error: LStatus != 0x04.");
-                return;
+                await Task.Delay(CmdExecDelayMilliseconds);
+
+                if (gauge.FlagGAUGE_EN == true || gauge.FlagQEN == true)
+                {
+                    LogView.AddEntry("Failed to disable gauging mode.");
+                    return;
+                }
             }
 
             if (gauge.FlagDSG == false)
@@ -357,22 +382,38 @@ namespace BQEV23K
             Properties.Settings.Default.DischargeRelaxHours = CfgCycleDischargeRelaxHours.Text;
             Properties.Settings.Default.Save();
 
-            List<GenericTask> tl = new List<GenericTask> {
+            List<GenericTask> tl = new List<GenericTask>();
+
+            if (selectedCycleType == CycleType.LearningCycle)
+            {
+                tl = new List<GenericTask> {
                 new DischargeTask(termVoltage),
                 new RelaxTask(relaxTimeDischarge),
                 new ChargeTask(taperCurrent),
                 new RelaxTask(relaxTimeCharge),
                 new DischargeTask(termVoltage),
-                new RelaxTask(relaxTimeDischarge)};
+                new RelaxTask(relaxTimeDischarge) };
 
-            if (true)
-            { // Perform field update cycle to reach LStatus 0x0E
-                tl.AddRange(new GenericTask[]{
+                if (true)
+                { // Perform field update cycle to reach LStatus 0x0E
+                    tl.AddRange(new GenericTask[]{
                     new ChargeTask(taperCurrent),
                     new RelaxTask(relaxTimeCharge),
                     new DischargeTask(termVoltage),
                     new RelaxTask(relaxTimeDischarge)});
+                }
             }
+            else if (selectedCycleType == CycleType.GpcCycle)
+            {
+                tl = new List<GenericTask> {
+                new ChargeTask(taperCurrent),
+                new RelaxTask(relaxTimeCharge),
+                new DischargeTask(termVoltage),
+                new RelaxTask(relaxTimeDischarge) };
+
+                gpcLog = new GpcDataLog(cellCount);
+            }
+
             cycle = new Cycle(tl, gauge);
             cycle.CycleModeType = selectedCycleModeType;
             cycle.LogWriteEvent += LogView.AddEntry;
@@ -381,8 +422,8 @@ namespace BQEV23K
 
             timerUpdatePlot.Start();
 
-            ButtonLearnStart.IsEnabled = false;
-            ButtonLearnCancel.IsEnabled = true;
+            ButtonCycleStart.IsEnabled = false;
+            ButtonCycleCancel.IsEnabled = true;
         }
 
         /// <summary>
@@ -394,21 +435,21 @@ namespace BQEV23K
         {
             // Add trophy here.
             timerUpdatePlot.Stop();
-            ButtonLearnStart.IsEnabled = true;
-            ButtonLearnCancel.IsEnabled = false;
+            ButtonCycleStart.IsEnabled = true;
+            ButtonCycleCancel.IsEnabled = false;
         }
 
         /// <summary>
-        /// Cancel running learning cycle on button click.
+        /// Cancel running learning or GPC cycle on button click.
         /// </summary>
         /// <param name="sender">Not used.</param>
         /// <param name="e">Not used.</param>
-        private void ButtonLearnCancel_Click(object sender, RoutedEventArgs e)
+        private void ButtonCycleCancel_Click(object sender, RoutedEventArgs e)
         {
             timerUpdatePlot.Stop();
             cycle.CancelCycle();
-            ButtonLearnStart.IsEnabled = true;
-            ButtonLearnCancel.IsEnabled = false;
+            ButtonCycleStart.IsEnabled = true;
+            ButtonCycleCancel.IsEnabled = false;
         }
 
         /// <summary>
@@ -438,17 +479,16 @@ namespace BQEV23K
             switch (selectedCycleType)
             {
                 case CycleType.LearningCycle:
-                    TabItemLearningCycle.IsEnabled = true;
-                    TabItemGpcCycle.IsEnabled = false;
+                    TabItemCycle.Header = "Learning Cycle";
                     break;
                 case CycleType.GpcCycle:
-                    TabItemLearningCycle.IsEnabled = false;
-                    TabItemGpcCycle.IsEnabled = true;
+                    TabItemCycle.Header = "GPC Cycle";
                     break;
                 default:
                     return;
             }
 
+            TabItemCycle.IsEnabled = true;
             TabItemConfiguration.IsEnabled = true;
             System.Windows.Controls.TabItem t = (System.Windows.Controls.TabItem)tabControl.Items[1];
             t.IsSelected = true;
@@ -484,7 +524,7 @@ namespace BQEV23K
         /// <param name="e">Not used.</param>
         private void ButtonResetZoom_Click(object sender, RoutedEventArgs e)
         {
-            PlotView1.ResetAllAxes();
+            PlotView.ResetAllAxes();
         }
     }
 }

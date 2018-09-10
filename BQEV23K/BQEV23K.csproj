@@ -55,6 +55,9 @@
   <PropertyGroup>
     <StartupObject>BQEV23K.App</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\App.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AxInterop.BQ80XRWLib">
       <HintPath>..\AxBQEV23K\bin\Debug\AxInterop.BQ80XRWLib.dll</HintPath>
@@ -103,6 +106,7 @@
     <Compile Include="GaugeInfo.cs" />
     <Compile Include="EV23K.cs" />
     <Compile Include="GenericTask.cs" />
+    <Compile Include="GpcDataLog.cs" />
     <Compile Include="LabelledTextboxCheck.xaml.cs">
       <DependentUpon>LabelledTextboxCheck.xaml</DependentUpon>
     </Compile>
@@ -228,6 +232,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\App.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

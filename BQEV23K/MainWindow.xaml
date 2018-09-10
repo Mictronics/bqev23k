@@ -83,6 +83,8 @@
                             <TextBlock TextWrapping="Wrap" Text="Cycle related parameters stored in device data flash. Must be configured correct prior to learning cycle." Width="380"/>
                             <local:LabelledTextboxCheck x:Name="CfgBattCellCount" Label="Cell Count" Unit="" HorizontalAlignment="Left" Width="380"/>
                             <local:LabelledTextboxCheck x:Name="CfgBattChemID" Label="Chemistry ID" Unit="" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgBattDesignVoltage" Label="Design Voltage" Unit="" HorizontalAlignment="Left" Width="380"/>
+                            <local:LabelledTextboxCheck x:Name="CfgBattDesignCapacity" Label="Design Capacity" Unit="" HorizontalAlignment="Left" Width="380"/>
                             <local:LabelledTextboxCheck x:Name="CfgBattTaperCurr" Label="Taper Current" Unit="mA" HorizontalAlignment="Left" Width="380"/>
                             <local:LabelledTextboxCheck x:Name="CfgBattDsgCurrThres" Label="Discharge Current Threshold" Unit="mA" HorizontalAlignment="Left" Width="380"/>
                             <local:LabelledTextboxCheck x:Name="CfgBattChgCurrThres" Label="Charge Current Threshold" Unit="mA" HorizontalAlignment="Left" Width="380"/>
@@ -102,14 +104,14 @@
                     <Image Name="ConfigHelpImage"  Width="580" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </WrapPanel>
             </TabItem>
-            <TabItem Name="TabItemLearningCycle" Header="Learning Cycle" IsEnabled="False">
+            <TabItem Name="TabItemCycle" Header="Cycle" IsEnabled="False">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="130" MinHeight="130"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*" MinHeight="100"/>
                     </Grid.RowDefinitions>
                     <GroupBox Header="Status" Background="White" Grid.Row="0">
                         <DockPanel>
@@ -118,6 +120,7 @@
                                 <local:LedControl x:Name="FlagREST" Height="24" IsChecked="False" Label="REST"/>
                                 <local:LedControl x:Name="FlagRDIS" Height="24" IsChecked="False" Label="RDIS"/>
                                 <local:LedControl x:Name="FlagFC" Height="24" IsChecked="False" Label="FC"/>
+                                <local:LedControl x:Name="FlagOCVFR" Height="24" IsChecked="False" Label="OCVFR"/>
                                 <local:LedControl x:Name="FlagQMAX" Height="24" IsChecked="False" Label="QMAX"/>
                                 <local:LedControl x:Name="FlagQEN" Height="24" IsChecked="False" Label="QEN"/>
                                 <local:LedControl x:Name="FlagGAUGE_EN" Height="24" IsChecked="False" Label="GAUGE_EN"/>
@@ -125,13 +128,13 @@
                                 <local:LedControl x:Name="FlagDSG" Height="24" IsChecked="False" Label="DSG"/>
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Width="100">
-                                <Button Name="ButtonLearnStart" Margin="5" Click="ButtonLearnStart_Click">
+                                <Button Name="ButtonCycleStart" Margin="5" Click="ButtonCycleStart_Click">
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="Resources/StartLoop.png" Width="16" Height="16" Margin="0,0,10,0"/>
                                         <TextBlock>Start</TextBlock>
                                     </StackPanel>
                                 </Button>
-                                <Button Name="ButtonLearnCancel" Margin="5" Click="ButtonLearnCancel_Click" IsEnabled="False">
+                                <Button Name="ButtonCycleCancel" Margin="5" Click="ButtonCycleCancel_Click" IsEnabled="False">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                         <Image Source="Resources/CancelLoop.png" Width="16" Height="16" Margin="0,0,10,0"/>
                                         <TextBlock>Cancel</TextBlock>
@@ -148,7 +151,7 @@
                     </GroupBox>
                     <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Height="5" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows"/>
                     <GroupBox Header="Plot" Background="White" Grid.Row="2" Margin="0,0,0,25">
-                            <oxy:PlotView Name="PlotView1" Model="{Binding Plot1}" Margin="70,0,0,0"/>
+                            <oxy:PlotView Name="PlotView" Model="{Binding Plot1}" Margin="70,0,0,0"/>
                     </GroupBox>
                     <StackPanel Orientation="Horizontal" Grid.Row="2" VerticalAlignment="Bottom">
                         <Button Name="ButtonResetZoom" Content="Reset Zoom" Margin="0,0,10,0" Width="100" Click="ButtonResetZoom_Click"/>
@@ -158,9 +161,6 @@
                         <local:LogViewer x:Name="LogView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White"/>
                     </GroupBox>
                 </Grid>
-            </TabItem>
-            <TabItem Name="TabItemGpcCycle" Header="GPC Cycle" IsEnabled="False">
-                <Grid/>
             </TabItem>
         </TabControl>
     </Grid>

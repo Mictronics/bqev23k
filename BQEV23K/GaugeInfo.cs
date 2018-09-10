@@ -159,6 +159,17 @@ namespace BQEV23K
         }
 
         /// <summary>
+        /// Get status of FET_EN flag.
+        /// </summary>
+        public bool FlagOCV
+        {
+            get
+            {
+                return sbsItems.SbsRegister.Find(x => x.Caption == "IT Status").SbsBitItems.Find(x => x.SbsCaption == "OCVFR").SbsBitValue != 0;
+            }
+        }
+
+        /// <summary>
         /// Get status of FC flag.
         /// </summary>
         public bool FlagFC
@@ -212,7 +223,7 @@ namespace BQEV23K
                 return sbsItems.SbsRegister.Find(x => x.Caption == "Manufacturing Status").SbsBitItems.Find(x => x.SbsCaption == "FET_EN").SbsBitValue != 0;
             }
         }
-
+        
         public string DFCellCount
         {
             get
@@ -250,6 +261,22 @@ namespace BQEV23K
             get
             {
                 return bcfgItems.DataflashItems.Find(x => x.Caption == "Chg Current Threshold").RawValue.ToString();
+            }
+        }
+
+        public string DFDesignVoltage
+        {
+            get
+            {
+                return bcfgItems.DataflashItems.Find(x => x.Caption == "Design Voltage").RawValue.ToString();
+            }
+        }
+
+        public string DFDesignCapacity
+        {
+            get
+            {
+                return bcfgItems.DataflashItems.Find(x => x.Caption == "Design Capacity mAh").RawValue.ToString();
             }
         }
 

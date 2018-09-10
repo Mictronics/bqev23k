@@ -13,6 +13,7 @@ namespace BQEV23K
     {
         private bool isInitialized = false;
         private int duration = 0;
+        private DateTime startTime;
         private DateTime endTime;
 
         #region Properties
@@ -48,6 +49,17 @@ namespace BQEV23K
                 return endTime;
             }
         }
+
+        /// <summary>
+        /// Get start time of task.
+        /// </summary>
+        override public DateTime StartTime
+        {
+            get
+            {
+                return startTime;
+            }
+        }
         #endregion
 
         /// <summary>
@@ -65,7 +77,7 @@ namespace BQEV23K
         /// <returns>Initialization status.</returns>
         override public bool InitializeTask()
         {
-            endTime = DateTime.Now;
+            startTime = endTime = DateTime.Now;
             endTime = endTime.AddMinutes(duration);
             isInitialized = true;
             return true;
