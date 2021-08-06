@@ -36,7 +36,7 @@ Built and tested on Windows7 64bit with Visual Studio 2015.
 - NuGet Oxplot.Core and Oxplot.Wpf packages.
 
 ### Setup of new Visual Studio project with bq80xrw implementation
-1. Download [EV2300 customer kit](https://e2e.ti.com/support/power_management/battery_management/f/180/p/671348/2470529#2470529)
+1. Download [EV2300 customer kit](https://www.mictronics.de/aO8F2bW9/EV2300_Customer_Kit.zip)
 2. Run and install *EV2300DevKitSetup.exe*
 3. Create new C# WPF project in Visual Studio
    - BQEK23K_Demo
